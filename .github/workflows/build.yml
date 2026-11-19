@@ -1,0 +1,49 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build with Maven
+        run: mvn -B -q package
+
+      - name: Upload jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MagicBlockPlus-jar
+          path: target/MagicBlockPlus-*.jar
+
+      - name: Package zip
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cd target
+          zip -j MagicBlockPlus.zip MagicBlockPlus-*.jar
+
+      - name: Create release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/MagicBlockPlus.zip
+          body: |
+            MagicBlockPlus ${{ github.ref_name }}
+
+            下载 `target/MagicBlockPlus.zip` 里的 jar，放进服务端 `plugins/` 目录。
+            兼容 Paper/Spigot 1.20.1 及以上（Java 17+）。

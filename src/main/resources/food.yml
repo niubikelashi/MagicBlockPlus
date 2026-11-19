@@ -1,0 +1,33 @@
+# =============================================================
+#  魔法食物配置（/mb food <材料> [次数] [玩家]）
+#  吃一次消耗一次次数；次数用尽后按 config.yml 的 depleted-action 处理
+# =============================================================
+
+foods:
+  GOLDEN_APPLE:
+    uses: 5
+    name: "&6✦ 魔法金苹果 ✦"
+    lore:
+      - "&7魔法食物，吃一次消耗一次次数。"
+  GOLDEN_CARROT:
+    uses: 10
+    name: "&6✦ 魔法金胡萝卜 ✦"
+    lore:
+      - "&7魔法食物。"
+  BREAD:
+    uses: 20
+    name: "&b✦ 魔法面包 ✦"
+    lore:
+      - "&7魔法食物。"
+  COOKED_BEEF:
+    uses: 20
+    name: "&b✦ 魔法牛排 ✦"
+    lore:
+      - "&7魔法食物。"
+  COOKIE:
+    uses: 32
+    name: "&e✦ 魔法饼干 ✦"
+    lore:
+      - "&7魔法食物。"
+
+# 食物物品的 lore 会附加使用次数与进度条（同 config.yml 的 display.show-info）

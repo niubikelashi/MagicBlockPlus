@@ -1,0 +1,263 @@
+# =============================================================
+#  MagicBlockPlus 配置文件
+#  所有配置都可热重载：/mb reload
+# =============================================================
+
+# 消息前缀（支持 & 颜色代码）
+prefix: "&7[MagicBlockPlus] "
+
+# 语言：zh_CN | en （只影响插件自带文案，方块名走 custom-block-translations）
+language: "zh_CN"
+
+# 自定义方块显示名（区分大小写，使用 Minecraft 的材料名）
+# 未列出的材料会显示为自动生成的英文名（如 Grass Block）
+custom-block-translations:
+  STONE: "石头"
+  DIAMOND_BLOCK: "钻石块"
+  OBSIDIAN: "黑曜石"
+
+# ---------------- 魔法方块规则 ----------------
+
+# 新魔法方块的默认使用次数（-1 = 无限）
+default-uses: 50
+
+# 允许的最大使用次数（防止 /mb settimes 写进天文数字）
+max-uses-limit: 100000
+
+# 是否启用绑定系统：魔法方块第一次放置时绑定到放置者
+enable-binding-system: true
+
+# 是否允许其他玩家使用/破坏别人绑定的方块
+allow-use-bound-blocks: false
+allow-break-bound-blocks: false
+
+# 禁止放置魔法方块的世界（大小写不敏感）
+blacklisted-worlds:
+  - world_nether
+  - world_the_end
+
+# 次数用尽时怎么处理手中的物品：convert（变成普通方块物品）| delete（直接删除）
+depleted-action: convert
+
+# 破坏魔法方块时是否掉落带剩余次数的魔法方块（false = 只清除记录，按原版掉落）
+return-item-on-break: true
+
+# 爆炸（方块爆炸 / 实体爆炸）时是否掉落魔法方块
+drop-on-explosion: true
+
+# 魔法方块被活塞推动时：cancel（阻止活塞推动它，保住记录）| forget（放弃记录）
+piston-behavior: cancel
+
+# 保护魔法方块不被以下情况摧毁：水流/岩浆流动、方块生长、草传播、燃烧、物理更新
+protect-from-fluid: true
+protect-from-growth: true
+protect-from-burn: true
+protect-from-physics: true
+
+# ---------------- 显示 ----------------
+
+display:
+  # %s 替换为方块显示名
+  block-name-format: "&b✦ %s ✦"
+  show-info:
+    bound-player: true
+    usage-count: true
+    progress-bar: true
+  # 进度条长度（字符数）
+  progress-bar-length: 10
+  decorative-lore:
+    enabled: true
+    # 支持插件自带变量：
+    # %uses% %remaining% %max% %progress% %bar% %owner%
+    # 若安装了 PlaceholderAPI，还会解析 PAPI 变量
+    lines:
+      - "&7这是一个魔法方块，蕴含魔法的力量。"
+      - "&7剩余次数: &e%remaining%&7/&f%max%"
+
+# ---------------- GUI ----------------
+
+gui:
+  title: "&8⚡ &bMagicBlockPlus 选择"
+  rows: 6
+  # 每页容量 = rows*9 - 按钮槽位（按钮在第 6 行）
+  buttons:
+    previous-page:
+      material: ARROW
+      name: "&a« 上一页"
+      lore: ["&7点击返回上一页"]
+      slot: 45
+      disabled-material: GRAY_DYE
+      disabled-name: "&8« 上一页（禁用）"
+    next-page:
+      material: ARROW
+      name: "&a下一页 »"
+      lore: ["&7点击前往下一页"]
+      slot: 53
+      disabled-material: GRAY_DYE
+      disabled-name: "&8下一页 »（禁用）"
+    page-info:
+      material: PAPER
+      name: "&e第 {page}/{total} 页"
+      lore: ["&7当前页码"]
+      slot: 49
+    close:
+      material: BARRIER
+      name: "&c关闭"
+      lore: ["&7点击关闭界面"]
+      slot: 47
+
+  # 基础可用材料（拥有 magicblock.gui 权限即可看到）
+  # 写错或当前版本不存在的材料会被跳过并记录到日志（不会崩溃）
+  materials:
+    - STONE
+    - COBBLESTONE
+    - OAK_PLANKS
+    - SPRUCE_PLANKS
+    - BIRCH_PLANKS
+    - JUNGLE_PLANKS
+    - ACACIA_PLANKS
+    - DARK_OAK_PLANKS
+    - SAND
+    - GRAVEL
+    - GLASS
+    - REDSTONE_BLOCK
+    - LAPIS_BLOCK
+    - IRON_BLOCK
+    - GOLD_BLOCK
+    - DIAMOND_BLOCK
+    - EMERALD_BLOCK
+    - OBSIDIAN
+    - NETHERRACK
+    - SOUL_SAND
+    - NETHER_BRICKS
+    - END_STONE
+    - WHITE_CONCRETE
+    - ORANGE_CONCRETE
+    - MAGENTA_CONCRETE
+    - LIGHT_BLUE_CONCRETE
+    - YELLOW_CONCRETE
+    - LIME_CONCRETE
+    - PINK_CONCRETE
+    - GRAY_CONCRETE
+    - LIGHT_GRAY_CONCRETE
+    - CYAN_CONCRETE
+    - PURPLE_CONCRETE
+    - BLUE_CONCRETE
+    - BROWN_CONCRETE
+    - GREEN_CONCRETE
+    - RED_CONCRETE
+    - BLACK_CONCRETE
+
+  # 组材料：需要权限 magicblock.group.<组名>
+  group:
+    vip-material:
+      - QUARTZ_BLOCK
+      - PRISMARINE
+      - PURPUR_BLOCK
+    mvp-material:
+      - BEACON
+      - DRAGON_EGG
+      - NETHERITE_BLOCK
+
+# ---------------- 持久化 ----------------
+
+storage:
+  # 世界里的魔法方块记录文件：plugins/MagicBlockPlus/world-blocks.yml
+  # 玩家保存的方块列表文件：plugins/MagicBlockPlus/bindings.yml
+  # 最迟多少秒落盘一次（脏数据）
+  save-interval-seconds: 5
+  # 关闭插件时强制保存
+  save-on-disable: true
+  # 启动时是否校验并清理指向空气的记录（会加载区块，建议关掉，靠事件自然清理）
+  validate-on-startup: false
+
+# ---------------- 其它 ----------------
+
+# 记录玩家使用日志（默认关，避免刷日志）
+log-usage: false
+
+# 启用统计（/mb stats）
+enable-statistics: true
+
+# 启动时异步检查 GitHub 最新 release（默认关，避免联网）
+check-updates: false
+update-check-owner: "niubikelashi"
+update-check-repo: "MagicBlockPlus"
+
+# 启动时跑一遍内部自检并打印 PASS/FAIL（生产环境保持 false）
+self-test: false
+
+# 打印调试日志（排障时临时开，平时保持 false）
+debug-mode: false
+
+# ---------------- 消息 ----------------
+# language 决定读哪一组；缺的键会退回 zh_CN。
+# 占位符：%player% %material% %owner% %reason% %count% %remaining% %total% %page% %stats% %version% %current% %error% %details% %state% %label% %food% %api%
+
+messages:
+  zh_CN:
+    no-permission: "&c你没有权限执行这个操作。"
+    no-permission-use: "&c你没有权限使用魔法方块。"
+    no-permission-break: "&c你没有权限破坏魔法方块。"
+    player-required: "&c这个命令只能由玩家执行。"
+    player-not-found: "&c找不到玩家 %player%。"
+    unknown-material: "&c材料 %material% 不存在（当前服务端版本不支持）。"
+    unknown-food: "&c食物 %food% 没有在 food.yml 里定义。"
+    unknown-command: "&c未知子命令 %label%，用 /mb help 查看用法。"
+    usage: "&e用法：/mb help"
+    help: "&b✦ MagicBlockPlus ✦"
+    help-commands: "&7/mb gui ｜ /mb search <关键词> ｜ /mb list ｜ /mb get <材料> [次数] ｜ /mb give <玩家> <材料> [次数] ｜ /mb food <食物> [次数] ｜ /mb retrieve <世界> <x> <y> <z> ｜ /mb settimes <世界> <x> <y> <z> <次数> ｜ /mb addtimes <世界> <x> <y> <z> <增减> ｜ /mb stats ｜ /mb reload ｜ /mb version"
+    world-blacklisted: "&c这个世界不允许放置魔法方块。"
+    depleted: "&c这个魔法物品的使用次数已用尽。"
+    bound-to-you: "&7已绑定到你。"
+    not-bound-to-you: "&c它属于 %owner%，你不能用它。"
+    got-with-count: "&7获得 %count% 个，剩余次数 %remaining%。"
+    gave-to-player: "&7已给 %player% 一个魔法方块（次数 %remaining%）。"
+    retrieved: "&7已取回 %block%。"
+    retrieve-failed: "&c取回失败：%reason%"
+    toggled-hidden: "&7列表显示状态已切换：%state%"
+    gui-page-info: "&7第 %page% 页 / 共 %total% 项"
+    stats: "&7统计：%stats%"
+    block-count: "&7世界里共有 %count% 个魔法方块"
+    material-count: "&7可选材料 %total% 个"
+    set-times: "&7该方块的剩余次数已设为 %count%"
+    reloaded: "&7配置已重载，可用材料 %count% 个"
+    version: "&7MagicBlockPlus %version%（api-version %api%）"
+    updated: "&7发现新版本 %version%，当前 %current%。"
+    up-to-date: "&7已是最新版本 %current%。"
+    update-check-failed: "&7更新检查失败：%error%"
+    self-test-pass: "&a自检通过：%details%"
+    self-test-fail: "&c自检失败：%details%"
+  en:
+    no-permission: "&cYou don't have permission for that."
+    no-permission-use: "&cYou don't have permission to use magic blocks."
+    no-permission-break: "&cYou don't have permission to break magic blocks."
+    player-required: "&cOnly players can run this command."
+    player-not-found: "&cPlayer %player% not found."
+    unknown-material: "&cMaterial %material% does not exist in this server version."
+    unknown-food: "&cFood %food% is not defined in food.yml."
+    unknown-command: "&cUnknown subcommand %label%; see /mb help."
+    usage: "&eUsage: /mb help"
+    help: "&b✦ MagicBlockPlus ✦"
+    help-commands: "&7/mb gui | /mb search <keyword> | /mb list | /mb get <material> [uses] | /mb give <player> <material> [uses] | /mb food <food> [uses] | /mb retrieve <world> <x> <y> <z> | /mb settimes <world> <x> <y> <z> <uses> | /mb addtimes <world> <x> <y> <z> <delta> | /mb stats | /mb reload | /mb version"
+    world-blacklisted: "&cMagic blocks are not allowed in this world."
+    depleted: "&cThis magic item has no uses left."
+    bound-to-you: "&7Bound to you."
+    not-bound-to-you: "&cIt belongs to %owner%; you can't use it."
+    got-with-count: "&7Got %count%, %remaining% uses left."
+    gave-to-player: "&7Gave %player% a magic block (%remaining% uses)."
+    retrieved: "&7Retrieved %block%."
+    retrieve-failed: "&cRetrieve failed: %reason%"
+    toggled-hidden: "&7List visibility toggled: %state%"
+    gui-page-info: "&7Page %page% of %total%"
+    stats: "&7Stats: %stats%"
+    block-count: "&7%count% magic blocks in the world"
+    material-count: "&7%total% selectable materials"
+    set-times: "&7Remaining uses set to %count%"
+    reloaded: "&7Config reloaded, %count% materials available"
+    version: "&7MagicBlockPlus %version% (api-version %api%)"
+    updated: "&7New version %version% found, current %current%."
+    up-to-date: "&7Already on the latest version %current%."
+    update-check-failed: "&7Update check failed: %error%"
+    self-test-pass: "&aSelf-test passed: %details%"
+    self-test-fail: "&cSelf-test failed: %details%"

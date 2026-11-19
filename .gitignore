@@ -1,0 +1,10 @@
+target/
+build/
+dist/
+libs/
+*.jar
+*.zip
+*.ps1
+*.args
+.classpath
+.project

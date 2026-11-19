@@ -1,0 +1,69 @@
+name: MagicBlockPlus
+version: '1.0.0'
+main: io.github.niubikelashi.magicblockplus.MagicBlockPlusPlugin
+api-version: '1.20'
+authors: [niubikelashi]
+description: Magic blocks with limited use counts - rewritten with 1.20.1+ compatibility and fixes for disappearing blocks and duplication.
+softdepend: [PlaceholderAPI]
+folia-supported: false
+
+commands:
+  magicblock:
+    description: MagicBlockPlus main command
+    aliases: [mb, mbp]
+    usage: /<command> [subcommand] [args]
+    permission: magicblock.use
+
+permissions:
+  magicblock.use:
+    description: Place and use magic blocks, open the selection GUI
+    default: true
+  magicblock.break:
+    description: Break magic blocks
+    default: true
+  magicblock.breakprotected:
+    description: Bypass the owner restriction when breaking someone else's magic block
+    default: op
+  magicblock.gui:
+    description: Open the block selection GUI
+    default: true
+  magicblock.get:
+    description: Give yourself a magic block
+    default: op
+  magicblock.give:
+    description: Give a magic block to another player
+    default: op
+  magicblock.food:
+    description: Give magic food items
+    default: op
+  magicblock.list:
+    description: View your bound/saved blocks
+    default: true
+  magicblock.retrieve:
+    description: Retrieve saved blocks from your list
+    default: true
+  magicblock.reload:
+    description: Reload configuration
+    default: op
+  magicblock.settimes:
+    description: Set or add default use counts per material
+    default: op
+  magicblock.stats:
+    description: View plugin statistics
+    default: op
+  magicblock.admin:
+    description: All MagicBlockPlus commands
+    default: op
+    children:
+      magicblock.use: true
+      magicblock.break: true
+      magicblock.breakprotected: true
+      magicblock.gui: true
+      magicblock.get: true
+      magicblock.give: true
+      magicblock.food: true
+      magicblock.list: true
+      magicblock.retrieve: true
+      magicblock.reload: true
+      magicblock.settimes: true
+      magicblock.stats: true
