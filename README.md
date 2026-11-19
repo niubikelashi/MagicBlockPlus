@@ -107,17 +107,21 @@
 
 GitHub Actions：`mvn package` → 工件 `MagicBlockPlus-jar`；打 tag（`v*`）时额外产出 zip 并创建 Release。
 
-本仓库也提供 `build.ps1`（Windows 本机无 Maven 时的离线构建：`javac` + `jar`，依赖 jar 放在 `libs/`，
-该目录不入库）。
+本仓库也提供 `build.ps1`（Windows 本机没有 Maven 时的离线构建：`javac` + `jar`，依赖 jar 放 `libs/`，
+该目录不入库）。它会先把 class 文件摊到 jar 根目录再打包，所以产出的 jar 在原生 CraftBukkit/Spigot 上也能加载。
 
 ## 验证（真实服务端）
 
-- 离线编译：JDK 17，16 个源文件编译通过，jar 69 KB。
-- 真实服务端冒烟：Leaves `1.21.11-156`（MC 1.21.11，Java 21）加载并启用成功，
-  日志 `[MagicBlockPlus] 启用完成：可用材料 38 个`、`§a自检通过：全部检查通过`，插件相关异常 0 条。
+- 离线编译：JDK 17，16 个源文件编译通过，jar 68 KB，字节码 major 61（Java 17）。
+- **CraftBukkit 1.20.1**（`3871-Bukkit-3f9263b`，Java 17）：加载 + 启用成功，日志出现
+  `启用完成：可用材料 38 个，已知魔法方块记录 0 条，语言 zh_CN` 与 `自检通过：全部检查通过`，插件相关异常 0 条。
+- **Leaves 1.21.11-156**（MC 1.21.11，Java 21）：同样加载 + 启用成功，自检通过，插件相关异常 0 条。
+  （服务端自带的 `Failed to request yggdrasil public key / PKIX` 报错是本机网络拦截造成的噪音，与插件无关。）
 - 自检覆盖：PDC 身份、次数守恒（3 次物品只能放 3 次、第 4 次拒绝）、负数收敛、
   `toPlain`、记录/快照往返、配置非法值收敛、GUI 材料有效、文案存在、食物可食用、无限次数不递减，
   以及命令接线（控制台执行 `mb version/list/stats/get/retrieve/food/未知子命令` 均不抛异常）。
+- 注意：class 文件必须在 jar 根目录（`io/github/...`），不能放在 `classes/` 子目录下——
+  原生 CraftBukkit/Spigot 会报 `InvalidPluginException: Cannot find main class`（Paper 系的加载器看起来能容忍，所以这个坑很容易被漏掉）。
 
 ## 与原版的行为差异（刻意取舍）
 
