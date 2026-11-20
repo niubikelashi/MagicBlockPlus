@@ -233,9 +233,21 @@ public class ItemFactory {
         return new ItemStack(item.getType(), 1);
     }
 
-    public String displayName(Material material) {
+    /**
+     * 方块的基本显示名：配置里的 custom-block-translations 优先，
+     * 其次是内置中文名表（BlockNames），再兜底成英文可读名。
+     */
+    public String plainName(Material material) {
         String custom = translations.get(material.name());
-        String base = custom != null && !custom.isEmpty() ? custom : humanize(material.name());
+        if (custom != null && !custom.isEmpty()) {
+            return custom;
+        }
+        String chinese = BlockNames.translate(material.name());
+        return chinese == null ? humanize(material.name()) : chinese;
+    }
+
+    public String displayName(Material material) {
+        String base = plainName(material);
         String template = nameFormat == null || nameFormat.isEmpty() ? base : Text.color(nameFormat);
         String out = template.replace("%material", base).replace("%block", base)
                 .replace("%type", base).replace("%s", base);

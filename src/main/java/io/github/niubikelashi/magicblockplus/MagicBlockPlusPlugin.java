@@ -1,5 +1,6 @@
 package io.github.niubikelashi.magicblockplus;
 
+import io.github.niubikelashi.magicblockplus.core.BlockCatalog;
 import io.github.niubikelashi.magicblockplus.core.BlockStore;
 import io.github.niubikelashi.magicblockplus.core.FoodDef;
 import io.github.niubikelashi.magicblockplus.core.ItemFactory;
@@ -40,6 +41,7 @@ public class MagicBlockPlusPlugin extends JavaPlugin {
     private Text text;
     private Stats stats;
     private GuiManager gui;
+    private BlockCatalog catalog = new BlockCatalog();
     private final Map<String, FoodDef> foods = new LinkedHashMap<>();
     private final Map<String, String> nameCache = new ConcurrentHashMap<>();
     private BukkitTask flushTask;
@@ -60,6 +62,7 @@ public class MagicBlockPlusPlugin extends JavaPlugin {
         }
 
         gui = new GuiManager(this);
+        catalog.rebuild(settings, this::debug);
         gui.rebuildMaterials();
         loadFoods();
 
@@ -86,9 +89,16 @@ public class MagicBlockPlusPlugin extends JavaPlugin {
             runSelfTest();
         }
 
-        getLogger().info("启用完成：可用材料 " + gui.materialCount() + " 个，已知魔法方块记录 "
-                + store.total() + " 条，语言 " + settings.language
+        getLogger().info("启用完成：建筑方块 " + catalog.size() + " 个（内置常见 " + catalog.curatedCount()
+                + "，自动发现 " + catalog.autoAdded() + "，手动追加 " + catalog.extrasCount()
+                + "），已知魔法方块记录 " + store.total() + " 条，语言 " + settings.language
+                + (catalog.unknownNames().isEmpty() ? "" : "，未收录中文名 " + catalog.unknownNames().size()
+                        + " 个（可用 custom-block-translations 补）")
                 + (store.skippedOnLoad() > 0 ? "（载入时跳过 " + store.skippedOnLoad() + " 条不支持的记录）" : ""));
+        if (settings.debugMode && !catalog.unknownNames().isEmpty()) {
+            getLogger().info("未翻译样本: " + catalog.unknownNames().subList(0,
+                    Math.min(8, catalog.unknownNames().size())));
+        }
     }
 
     @Override
@@ -116,6 +126,7 @@ public class MagicBlockPlusPlugin extends JavaPlugin {
         settings = Settings.from(getConfig());
         applyItemSettings();
         text = new Text(settings.messages, settings.prefix, settings.language);
+        catalog.rebuild(settings, this::debug);
         gui.rebuildMaterials();
         loadFoods();
         if (flushTask != null) {
@@ -282,6 +293,10 @@ public class MagicBlockPlusPlugin extends JavaPlugin {
 
     public GuiManager gui() {
         return gui;
+    }
+
+    public BlockCatalog catalog() {
+        return catalog;
     }
 
     public Map<String, FoodDef> foods() {

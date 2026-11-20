@@ -337,13 +337,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                 }
                 return out;
             }
-            if (sub.equals("get") || sub.equals("give")) {
-                for (Material material : plugin.gui().materials()) {
-                    if (material.name().toLowerCase(Locale.ROOT).startsWith(prefix)) {
-                        out.add(material.name());
-                    }
-                }
-                return out;
+            if (sub.equals("get") || sub.equals("search")) {
+                return materialSuggestions(prefix);
             }
             if (sub.equals("food")) {
                 for (String key : plugin.foods().keySet()) {
@@ -364,11 +359,28 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         }
         if (args.length == 3 && (args[0].toLowerCase(Locale.ROOT).equals("get")
                 || args[0].toLowerCase(Locale.ROOT).equals("give"))) {
-            String prefix = args[2].toLowerCase(Locale.ROOT);
-            for (Material material : plugin.gui().materials()) {
-                if (material.name().toLowerCase(Locale.ROOT).startsWith(prefix)) {
-                    out.add(material.name());
-                }
+            return materialSuggestions(args[2].toLowerCase(Locale.ROOT));
+        }
+        return out;
+    }
+
+    /**
+     * 材料补全：英文枚举名前缀、中文名包含都算命中（最多 30 条）。
+     * 只给目录里的建筑方块，不会把箱子/小麦/水之类的补出来。
+     */
+    private List<String> materialSuggestions(String prefix) {
+        List<String> out = new ArrayList<>();
+        for (Material material : plugin.catalog().materials()) {
+            String name = material.name().toLowerCase(Locale.ROOT);
+            String chinese = plugin.items().plainName(material);
+            boolean hit = prefix.isEmpty() || name.startsWith(prefix)
+                    || (chinese != null && chinese.toLowerCase(Locale.ROOT).contains(prefix));
+            if (!hit) {
+                continue;
+            }
+            out.add(material.name());
+            if (out.size() >= 30) {
+                return out;
             }
         }
         return out;

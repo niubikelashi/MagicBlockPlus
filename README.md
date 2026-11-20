@@ -66,6 +66,32 @@
 | 28 | 聊天搜索方块会劫持聊天（两处注册 `AsyncPlayerChatEvent`） | 没有聊天搜索功能；GUI 用关键字参数搜索（`/mb gui <关键字>`），不会吞聊天 |
 | 29 | `config.yml` 注释示例写了不存在的 `CHERRY_BLOSSOM_BLOCK` | 材料表只列真实存在的 1.20 材料名，无效名字会被跳过并在 `debug-mode` 下打印 |
 
+## 建筑方块目录 + 全量汉化
+
+GUI 只卖「建筑方块」，不会把箱子、熔炉、作物、液体、红石机械这类奇奇怪怪的方块塞进界面。
+
+- **内置常见建筑方块**：`config.yml` 的 `building-blocks.categories` 按类别分组列好（石头与地形 /
+  木板与木质 / 砖瓦与装饰 / 金属与矿物块 / 陶瓦·玻璃·羊毛·混凝土 / 下界与末地 / 植物类建材），
+  GUI 就按这个顺序排。
+- **随版本自动发现新方块**：`building-blocks.auto-add` 打开后，插件按**命名规律**（正则）扫描
+  `Material.values()`：`*_PLANKS`/`*_STAIRS`/`*_SLAB`/`*_WALL`/`*_FENCE`/`*_BRICKS`/`*_TILES`/`*_PILLAR`/
+  `*_LOG`/`*_BLOCK`/`*_GLASS`/`*_WOOL`/`*_CARPET`/`*_CONCRETE`/`*_TERRACOTTA` 等建材家族，
+  新木种、新砖瓦、新陶瓦颜色会自动进目录，不用改代码。自动进来的归到「自动发现」类别。
+  上限 `auto-max`（默认 600），怕界面太长就调小。
+- **奇怪的方块一律不收**：`building-blocks.exclude` 是显式黑名单（容器、机器、红石、告示牌、门、床、
+  火把、液体、作物、树叶/树苗、珊瑚、蘑菇、矿石与粗金属、刷怪笼、结构方块、`LEGACY_*` 废弃材料…），
+  命中任意一条就进不了目录。门/床/告示牌被排除是因为它们是双格或实体掉落结构，走原版掉落路径
+  会绕过「只掉落一次」的保护，容易刷物品。
+- **候选还要满足**：`isBlock()`、不是空气、并且**有物品形态**（能进背包；新版本里某些「只有方块形态」
+  的材料会被跳过，不会抛异常拖垮插件）。
+- **全量汉化**：方块显示名由词根表拼装（`木种 + 制品`、`颜色 + 材质`、`磨制/裂纹/雕纹/涂蜡` 等修饰词），
+  所以新版本的新方块也能自动得到中文名；词根没收录的会退回英文可读名并在启用日志里报数量，
+  用 `custom-block-translations` 补一条即可（本轮实测 1.20.1 与 1.21.11 目录里未汉化数量为 0）。
+  GUI 标题、翻页按钮、lore、命令帮助、权限描述、`plugin.yml`、配置注释全是中文；
+  `language: en` 保留一份英文文案。`/mb search 玻璃` 能按中文名搜，`/mb get|give` 的 tab 补全也认中文名。
+- **管理员自选仍然生效**：`gui.materials` / `gui.group` 里的材料照旧加入（归到「手动追加」类别），
+  目录只管 GUI 与搜索；`/mb get|give` 可以给任意合法方块。
+
 ## 玩法与命令
 
 | 命令 | 作用 | 权限 |
@@ -90,6 +116,9 @@
 
 ## 关键配置（`config.yml`）
 
+- `building-blocks.enabled|auto-add|auto-max|show-category`：建筑方块目录开关（见上一节）
+- `building-blocks.include|exclude|categories`：建材命名规则、黑名单、分组清单，管理员可以直接改
+- `custom-block-translations`：给没翻出来的材料补中文名（优先级最高）
 - `default-uses` / `max-uses-limit`：默认次数与上限（非法值会被收敛，不会抛异常）
 - `enable-binding-system` / `allow-use-bound-blocks` / `allow-break-bound-blocks`：绑定保护
 - `blacklisted-worlds`：禁用世界
@@ -112,13 +141,18 @@ GitHub Actions：`mvn package` → 工件 `MagicBlockPlus-jar`；打 tag（`v*`�
 
 ## 验证（真实服务端）
 
-- 离线编译：JDK 17，16 个源文件编译通过，jar 68 KB，字节码 major 61（Java 17）。
+- 离线编译：JDK 17，18 个源文件编译通过，jar 89 KB，字节码 major 61（Java 17）。
 - **CraftBukkit 1.20.1**（`3871-Bukkit-3f9263b`，Java 17）：加载 + 启用成功，日志出现
-  `启用完成：可用材料 38 个，已知魔法方块记录 0 条，语言 zh_CN` 与 `自检通过：全部检查通过`，插件相关异常 0 条。
-- **Leaves 1.21.11-156**（MC 1.21.11，Java 21）：同样加载 + 启用成功，自检通过，插件相关异常 0 条。
+  `启用完成：建筑方块 428 个（内置常见 125，自动发现 303，手动追加 0），已知魔法方块记录 0 条，语言 zh_CN`
+  与 `自检通过：全部检查通过`，插件相关异常 0 条；`/mb version|list|stats|get|retrieve|未知子命令` 的回复全是中文。
+- **Leaves 1.21.11-156**（MC 1.21.11，Java 21）：同样加载 + 启用成功，
+  `建筑方块 467 个（内置常见 127，自动发现 340）`（1.21 新增的树脂块之类被自动收录），自检通过，插件相关异常 0 条。
+  日志末尾提示 `未收录中文名 2 个`，就是只在 1.21 才存在的那两种方块，用 `custom-block-translations` 补即可。
   （服务端自带的 `Failed to request yggdrasil public key / PKIX` 报错是本机网络拦截造成的噪音，与插件无关。）
 - 自检覆盖：PDC 身份、次数守恒（3 次物品只能放 3 次、第 4 次拒绝）、负数收敛、
   `toPlain`、记录/快照往返、配置非法值收敛、GUI 材料有效、文案存在、食物可食用、无限次数不递减，
+  建筑方块目录（必备建材在列、箱子/熔炉/作物/液体/告示牌等禁入、未汉化名不超过 40）、
+  目录配置容错（坏正则被忽略、`auto-max` 收敛到 2000、关掉目录后只认手写材料），
   以及命令接线（控制台执行 `mb version/list/stats/get/retrieve/food/未知子命令` 均不抛异常）。
 - 注意：class 文件必须在 jar 根目录（`io/github/...`），不能放在 `classes/` 子目录下——
   原生 CraftBukkit/Spigot 会报 `InvalidPluginException: Cannot find main class`（Paper 系的加载器看起来能容忍，所以这个坑很容易被漏掉）。

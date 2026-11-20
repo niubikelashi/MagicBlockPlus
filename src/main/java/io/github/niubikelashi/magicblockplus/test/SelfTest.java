@@ -183,6 +183,82 @@ public class SelfTest {
             problems.add("无限次数被递减了");
         }
 
+        // 11) 建筑方块目录：常见方块必须在，奇怪方块必须不在
+        io.github.niubikelashi.magicblockplus.core.BlockCatalog catalog = plugin.catalog();
+        if (catalog.size() == 0) {
+            problems.add("建筑方块目录为空");
+        }
+        for (Material material : catalog.materials()) {
+            if (!material.isBlock() || material.isAir()) {
+                problems.add("目录里有无效方块: " + material.name());
+            }
+        }
+        for (String required : List.of("STONE", "COBBLESTONE", "OAK_PLANKS", "BRICKS", "GLASS",
+                "IRON_BLOCK", "DEEPSLATE", "NETHER_BRICKS", "WHITE_TERRACOTTA", "WHITE_WOOL", "WHITE_CONCRETE")) {
+            Material material = Material.matchMaterial(required);
+            if (material != null && !catalog.contains(material)) {
+                problems.add("常见建筑方块缺失: " + required);
+            }
+        }
+        for (String banned : List.of("CHEST", "BARREL", "FURNACE", "SMOKER", "HOPPER", "OBSERVER",
+                "DISPENSER", "DROPPER", "REDSTONE_TORCH", "WHEAT", "SPAWNER", "END_PORTAL_FRAME",
+                "WATER", "LAVA", "FIRE", "OAK_SIGN", "OAK_LEAVES", "OAK_SAPLING", "POTTED_OAK_SAPLING",
+                "RAW_IRON", "DIAMOND_ORE", "RED_BED", "SCAFFOLDING", "BEACON", "COMPOSTER")) {
+            Material material = Material.matchMaterial(banned);
+            if (material != null && catalog.contains(material)) {
+                problems.add("目录里混进了奇怪方块: " + banned);
+            }
+        }
+        if (catalog.unknownNames().size() > 40) {
+            problems.add("太多建筑方块没有中文名: " + catalog.unknownNames().size());
+        }
+        // GUI 里真正显示的名字必须是中文（词根拼装 + 版本兼容）
+        for (String required : List.of("STONE", "GLASS", "OAK_PLANKS", "WHITE_TERRACOTTA", "COBBLESTONE")) {
+            Material material = Material.matchMaterial(required);
+            if (material != null) {
+                String shown = plugin.items().displayName(material);
+                if (!io.github.niubikelashi.magicblockplus.core.BlockNames.containsChinese(shown)) {
+                    problems.add("方块显示名没汉化: " + required + " -> " + shown);
+                }
+            }
+        }
+
+        // 12) 目录配置容错：坏正则 / 越界上限 / 关掉建筑模式都不能崩
+        YamlConfiguration catalogConfig = new YamlConfiguration();
+        catalogConfig.set("building-blocks.enabled", true);
+        catalogConfig.set("building-blocks.auto-add", true);
+        catalogConfig.set("building-blocks.auto-max", 1_000_000);
+        catalogConfig.set("building-blocks.include", List.of("([", "^.*_PLANKS$"));
+        catalogConfig.set("building-blocks.exclude", List.of(")"));
+        Settings catalogSettings = Settings.from(catalogConfig);
+        if (catalogSettings.autoMax > 2000) {
+            problems.add("auto-max 没有被收敛: " + catalogSettings.autoMax);
+        }
+        io.github.niubikelashi.magicblockplus.core.BlockCatalog probeCatalog =
+                new io.github.niubikelashi.magicblockplus.core.BlockCatalog();
+        probeCatalog.rebuild(catalogSettings, message -> {
+        });
+        if (probeCatalog.size() < probeCatalog.curatedCount()) {
+            problems.add("坏正则让目录变小了: " + probeCatalog.size() + " < " + probeCatalog.curatedCount());
+        }
+        if (probeCatalog.contains(Material.CHEST)) {
+            problems.add("坏排除正则把箱子放进来了");
+        }
+
+        YamlConfiguration off = new YamlConfiguration();
+        off.set("building-blocks.enabled", false);
+        off.set("gui.materials", List.of("STONE", "NOT_A_MATERIAL"));
+        io.github.niubikelashi.magicblockplus.core.BlockCatalog manualCatalog =
+                new io.github.niubikelashi.magicblockplus.core.BlockCatalog();
+        manualCatalog.rebuild(Settings.from(off), message -> {
+        });
+        if (manualCatalog.size() != 1) {
+            problems.add("关闭建筑模式后目录数量错误: " + manualCatalog.size());
+        }
+        if (manualCatalog.autoAdded() != 0) {
+            problems.add("关闭建筑模式后还在自动发现: " + manualCatalog.autoAdded());
+        }
+
         // 11) 命令接线：控制台执行不应抛异常（非玩家分支应给出提示而不是崩溃）
         String[] probes = {"mb version", "mb list", "mb stats", "mb get STONE 1", "mb retrieve world 1 2 3",
                 "mb food", "mb unknown-subcommand"};

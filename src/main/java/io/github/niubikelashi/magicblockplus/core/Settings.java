@@ -53,6 +53,15 @@ public class Settings {
     public final Map<String, List<String>> groupMaterials = new LinkedHashMap<>();
     public final Map<String, Integer> materialUses = new LinkedHashMap<>();
 
+    /** 建筑方块目录（config.yml 的 building-blocks 段）。 */
+    public boolean buildingEnabled = true;
+    public boolean autoAdd = true;
+    public int autoMax = 600;
+    public boolean showCategory = true;
+    public List<String> includePatterns = new ArrayList<>(BlockCatalog.defaultInclude());
+    public List<String> excludePatterns = new ArrayList<>(BlockCatalog.defaultExclude());
+    public final LinkedHashMap<String, List<String>> categories = new LinkedHashMap<>(BlockCatalog.defaultCategories());
+
     public int saveIntervalSeconds = 5;
     public boolean saveOnDisable = true;
     public boolean validateOnStartup = false;
@@ -149,6 +158,8 @@ public class Settings {
                 }
             }
         }
+        readBuildingBlocks(config, s);
+
         ConfigurationSection usesOverride = config.getConfigurationSection("material-uses");
         if (usesOverride != null) {
             for (String key : usesOverride.getKeys(false)) {
@@ -167,6 +178,60 @@ public class Settings {
         s.updateRepo = config.getString("update-check-repo", "MagicBlockPlus");
         s.selfTest = config.getBoolean("self-test", false);
         return s;
+    }
+
+    /**
+     * building-blocks 段：只收建筑方块、随版本自动发现新方块。
+     * 非法正则、越界数值都会被收敛，不会让 reload 崩掉。
+     */
+    private static void readBuildingBlocks(FileConfiguration config, Settings s) {
+        ConfigurationSection section = config.getConfigurationSection("building-blocks");
+        if (section == null) {
+            return;
+        }
+        s.buildingEnabled = section.getBoolean("enabled", s.buildingEnabled);
+        s.autoAdd = section.getBoolean("auto-add", s.autoAdd);
+        s.autoMax = Math.max(1, Math.min(2000, section.getInt("auto-max", s.autoMax)));
+        s.showCategory = section.getBoolean("show-category", s.showCategory);
+
+        List<String> include = readPatternList(section.getStringList("include"));
+        if (!include.isEmpty()) {
+            s.includePatterns = include;
+        }
+        List<String> exclude = readPatternList(section.getStringList("exclude"));
+        if (!exclude.isEmpty()) {
+            s.excludePatterns = exclude;
+        }
+
+        ConfigurationSection categories = section.getConfigurationSection("categories");
+        if (categories != null) {
+            LinkedHashMap<String, List<String>> parsed = new LinkedHashMap<>();
+            for (String key : categories.getKeys(false)) {
+                List<String> names = new ArrayList<>();
+                for (String raw : categories.getStringList(key)) {
+                    if (raw != null && !raw.trim().isEmpty()) {
+                        names.add(raw.trim().toUpperCase(Locale.ROOT));
+                    }
+                }
+                if (!names.isEmpty()) {
+                    parsed.put(key, names);
+                }
+            }
+            if (!parsed.isEmpty()) {
+                s.categories.clear();
+                s.categories.putAll(parsed);
+            }
+        }
+    }
+
+    private static List<String> readPatternList(List<String> raw) {
+        List<String> out = new ArrayList<>();
+        for (String text : raw) {
+            if (text != null && !text.trim().isEmpty()) {
+                out.add(text.trim());
+            }
+        }
+        return out;
     }
 
     private static Map<String, String> readMessages(FileConfiguration config, String language) {

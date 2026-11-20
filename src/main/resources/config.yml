@@ -1,263 +1,561 @@
-# =============================================================
-#  MagicBlockPlus 配置文件
-#  所有配置都可热重载：/mb reload
-# =============================================================
+# MagicBlockPlus 配置（全部中文）
+# 说明都写在旁边，改完用 /mb reload 生效，不用重启服务器。
 
-# 消息前缀（支持 & 颜色代码）
+# 消息前缀（支持 & 颜色码）
 prefix: "&7[MagicBlockPlus] "
 
-# 语言：zh_CN | en （只影响插件自带文案，方块名走 custom-block-translations）
-language: "zh_CN"
+# 语言：zh_CN（默认，全量汉化）或 en
+language: zh_CN
 
-# 自定义方块显示名（区分大小写，使用 Minecraft 的材料名）
-# 未列出的材料会显示为自动生成的英文名（如 Grass Block）
+# ------------------------------------------------------------------
+# 建筑方块目录
+# ------------------------------------------------------------------
+building-blocks:
+  # 只把「建筑方块」放进 GUI；关掉后就只认下面 gui.materials 里手写的材料
+  enabled: true
+  # 随版本更新自动发现新的建筑方块（新木种、新砖瓦、新陶瓦颜色都会自动进来）
+  auto-add: true
+  # 自动发现的数量上限（超过就停，避免 GUI 无限膨胀；调小可以让界面更精简）
+  auto-max: 600
+  # GUI 物品 lore 里显示所属类别
+  show-category: true
+
+  # 自动发现的「包含」规则：命中任意一条才算建筑方块（正则，匹配材料枚举名）
+  include:
+    - "^.*_PLANKS$"        # 木板
+    - "^.*_STAIRS$"        # 楼梯
+    - "^.*_SLAB$"          # 台阶
+    - "^.*_WALL$"          # 墙
+    - "^.*_FENCE$"         # 栅栏
+    - "^.*_FENCE_GATE$"    # 栅栏门
+    - "^.*_TRAPDOOR$"      # 活板门
+    - "^.*_BRICKS$"        # 砖
+    - "^.*_TILES$"         # 瓦
+    - "^.*_PILLAR$"        # 柱石
+    - "^.*_MOSAIC$"        # 拼花（竹片块之类）
+    - "^.*_WOOD$"          # 木头
+    - "^.*_LOG$"           # 原木（含去皮原木）
+    - "^.*_BLOCK$"         # 各类方块（草方块、雪块、苔藓块、金属块…）
+    - "^.*_HYPHAE$"        # 菌丝
+    - "^.*_STEM$"          # 菌杆
+    - "^.*_GLASS$"         # 玻璃
+    - "^.*_GLASS_PANE$"    # 玻璃板
+    - "^.*_WOOL$"          # 羊毛
+    - "^.*_CARPET$"        # 地毯
+    - "^.*_CONCRETE$"      # 混凝土
+    - "^.*_TERRACOTTA$"    # 陶瓦
+    - "^BRICKS$"           # 砖块
+    - "^STONE$"            # 石头
+    - "^COBBLESTONE$"      # 圆石
+    - "^MOSSY_COBBLESTONE$"
+    - "^GRANITE$"
+    - "^POLISHED_GRANITE$"
+    - "^DIORITE$"
+    - "^POLISHED_DIORITE$"
+    - "^ANDESITE$"
+    - "^POLISHED_ANDESITE$"
+    - "^DEEPSLATE$"
+    - "^COBBLED_DEEPSLATE$"
+    - "^POLISHED_DEEPSLATE$"
+    - "^TUFF$"             # 凝灰岩
+    - "^CALCITE$"          # 方解石
+    - "^SANDSTONE$"
+    - "^RED_SANDSTONE$"
+    - "^SMOOTH_SANDSTONE$"
+    - "^SMOOTH_RED_SANDSTONE$"
+    - "^STONE_BRICKS$"
+    - "^MOSSY_STONE_BRICKS$"
+    - "^DIRT$"
+    - "^COARSE_DIRT$"
+    - "^ROOTED_DIRT$"
+    - "^CLAY$"
+    - "^MUD$"
+    - "^PACKED_MUD$"
+    - "^MUD_BRICKS$"
+    - "^SAND$"
+    - "^GRAVEL$"
+    - "^SOUL_SAND$"
+    - "^SOUL_SOIL$"
+    - "^NETHERRACK$"
+    - "^OBSIDIAN$"
+    - "^COPPER_BLOCK$"
+    - "^GLOWSTONE$"
+    - "^SEA_LANTERN$"
+    - "^BONE_BLOCK$"
+    - "^PRISMARINE$"
+    - "^PRISMARINE_BRICKS$"
+    - "^END_STONE$"
+    - "^NETHER_BRICKS$"
+
+  # 「奇怪方块」排除名单：命中任意一条就绝不进目录
+  exclude:
+    - "^AIR$"
+    - "^CAVE_AIR$"
+    - "^VOID_AIR$"
+    - "^.*_CHEST$"           # 箱子 / 陷阱箱
+    - "^TRAPPED_CHEST$"
+    - "^BARREL$"
+    - "^ENDER_CHEST$"
+    - "^.*_SHULKER_BOX$"
+    - "^FURNACE$"            # 熔炉类
+    - "^BLAST_FURNACE$"
+    - "^SMOKER$"
+    - "^CRAFTING_TABLE$"
+    - "^ENCHANTING_TABLE$"
+    - "^CARTOGRAPHY_TABLE$"
+    - "^FLETCHING_TABLE$"
+    - "^GRINDSTONE$"
+    - "^STONECUTTER$"
+    - "^SMITHING_TABLE$"
+    - "^LOOM$"
+    - "^LECTERN$"
+    - "^ANVIL$"
+    - "^.*_ANVIL$"
+    - "^BEACON$"
+    - "^BELL$"
+    - "^CAKE$"
+    - "^HOPPER$"             # 红石机械
+    - "^OBSERVER$"
+    - "^DISPENSER$"
+    - "^DROPPER$"
+    - "^JUKEBOX$"
+    - "^NOTE_BLOCK$"
+    - "^COMPOSTER$"
+    - "^RESPAWN_ANCHOR$"
+    - "^.*_SPAWNER$"
+    - "^SPAWNER$"
+    - "^REDSTONE_TORCH$"
+    - "^REDSTONE_WALL_TORCH$"
+    - "^REDSTONE_WIRE$"
+    - "^REPEATER$"
+    - "^COMPARATOR$"
+    - "^TARGET$"
+    - "^LIGHTNING_ROD$"
+    - "^LEVER$"
+    - "^.*_BUTTON$"
+    - "^.*_PRESSURE_PLATE$"
+    - "^.*_RAIL$"
+    - "^TRIPWIRE$"
+    - "^TRIPWIRE_HOOK$"
+    - "^.*_DOOR$"            # 门是两格方块，破坏/掉落规则特殊，不收
+    - "^.*_SIGN$"            # 告示牌破坏走实体掉落，容易重复掉落，不收
+    - "^.*_HANGING_SIGN$"
+    - "^.*_BED$"
+    - "^.*COMMAND_BLOCK$"    # 命令方块
+    - "^LEGACY_.*"           # 老版本遗留的废弃材料
+    - "^.*_TORCH$"
+    - "^SOUL_TORCH$"
+    - "^FIRE$"
+    - "^SOUL_FIRE$"
+    - "^CAMPFIRE$"
+    - "^SOUL_CAMPFIRE$"
+    - "^WATER$"              # 液体
+    - "^LAVA$"
+    - "^SPONGE$"
+    - "^WET_SPONGE$"
+    - "^HONEY_BLOCK$"
+    - "^SLIME_BLOCK$"        # 粘性/特殊行为方块
+    - "^SCAFFOLDING$"
+    - "^STRUCTURE_BLOCK$"
+    - "^JIGSAW_BLOCK$"
+    - "^BARRIER$"
+    - "^LIGHT$"
+    - "^STRUCTURE_VOID$"
+    - "^END_PORTAL$"
+    - "^END_GATE$"
+    - "^END_PORTAL_FRAME$"
+    - "^DRAGON_EGG$"
+    - "^.*_ORE$"             # 矿石与粗金属（不是建材）
+    - "^RAW_.*"
+    - "^.*_SHROOM$"          # 作物与植物
+    - "^.*_FUNGUS$"
+    - "^.*_SPROUT$"
+    - "^SPORE_BLOSSOM$"
+    - "^.*_PROPAGULE$"
+    - "^.*_MUSHROOM.*"       # 蘑菇方块/蘑菇杆
+    - "^MUSHROOM_STEM$"
+    - "^.*_DRIPLEAF.*"
+    - "^DRIED_KELP_BLOCK$"
+    - "^.*_LEAVES$"
+    - "^.*_SAPLING$"
+    - "^POTTED_.*"
+    - "^AZALEA.*"
+    - "^.*_ROOTS$"
+    - "^.*_CORAL$"
+    - "^CORAL_BLOCK$"
+    - "^.*_CORAL_BLOCK$"
+    - "^.*_FAN$"
+    - "^.*_GRASS$"
+    - "^.*_FERN$"
+    - "^.*_SHRUB$"
+    - "^.*_BUSH$"
+    - "^.*_PETALS$"
+    - "^WHEAT$"
+    - "^CARROTS$"
+    - "^POTATOES$"
+    - "^BEETROOTS$"
+    - "^PUMPKIN_STEM$"
+    - "^MELON_STEM$"
+    - "^ATTACHED_.*"         # 挂在方块上的瓜藤
+    - "^PUMPKIN$"
+    - "^CARVED_PUMPKIN$"
+    - "^MELON$"
+    - "^SUGAR_CANE$"
+    - "^CACTUS$"
+    - "^BAMBOO$"
+    - "^BAMBOO_SPROUT$"
+    - "^CHORUS_.*"
+    - "^FROGSPAWN$"
+
+  # 常见建筑方块（按类别分组；GUI 就按这个顺序排，新版本没写到的同类方块会自动补进「自动发现」）
+  categories:
+    "石头与地形":
+      - STONE
+      - COBBLESTONE
+      - MOSSY_COBBLESTONE
+      - STONE_BRICKS
+      - MOSSY_STONE_BRICKS
+      - GRANITE
+      - POLISHED_GRANITE
+      - DIORITE
+      - POLISHED_DIORITE
+      - ANDESITE
+      - POLISHED_ANDESITE
+      - DEEPSLATE
+      - COBBLED_DEEPSLATE
+      - POLISHED_DEEPSLATE
+      - DEEPSLATE_BRICKS
+      - DEEPSLATE_TILES
+      - TUFF
+      - CALCITE
+      - SAND
+      - SANDSTONE
+      - SMOOTH_SANDSTONE
+      - RED_SANDSTONE
+      - SMOOTH_RED_SANDSTONE
+      - GRAVEL
+      - DIRT
+      - COARSE_DIRT
+      - ROOTED_DIRT
+      - GRASS_BLOCK
+      - MUD
+      - PACKED_MUD
+      - MUD_BRICKS
+      - CLAY
+      - SNOW_BLOCK
+      - ICE
+      - PACKED_ICE
+      - BLUE_ICE
+      - MAGMA_BLOCK
+    "木板与木质":
+      - OAK_PLANKS
+      - OAK_LOG
+      - STRIPPED_OAK_LOG
+      - OAK_WOOD
+      - OAK_STAIRS
+      - OAK_SLAB
+      - OAK_FENCE
+      - OAK_FENCE_GATE
+      - OAK_TRAPDOOR
+      - SPRUCE_PLANKS
+      - SPRUCE_LOG
+      - STRIPPED_SPRUCE_LOG
+      - SPRUCE_STAIRS
+      - SPRUCE_SLAB
+      - SPRUCE_FENCE
+      - BIRCH_PLANKS
+      - BIRCH_LOG
+      - BIRCH_STAIRS
+      - BIRCH_SLAB
+      - JUNGLE_PLANKS
+      - JUNGLE_LOG
+      - JUNGLE_STAIRS
+      - ACACIA_PLANKS
+      - ACACIA_LOG
+      - ACACIA_STAIRS
+      - DARK_OAK_PLANKS
+      - DARK_OAK_LOG
+      - DARK_OAK_STAIRS
+      - MANGROVE_PLANKS
+      - MANGROVE_LOG
+      - CHERRY_PLANKS
+      - CHERRY_LOG
+      - CHERRY_STAIRS
+      - BAMBOO_PLANKS
+      - BAMBOO_STAIRS
+    "砖瓦与装饰":
+      - BRICKS
+      - QUARTZ_BLOCK
+      - QUARTZ_PILLAR
+      - SMOOTH_QUARTZ
+      - QUARTZ_STAIRS
+      - PURPUR_BLOCK
+      - PURPUR_PILLAR
+      - PURPUR_STAIRS
+      - PRISMARINE
+      - PRISMARINE_BRICKS
+      - PRISMARINE_STAIRS
+      - SEA_LANTERN
+      - BONE_BLOCK
+      - GLOWSTONE
+      - OBSIDIAN
+      - CUT_COPPER
+      - CUT_COPPER_STAIRS
+      - CUT_COPPER_SLAB
+      - EXPOSED_COPPER
+      - WEATHERED_COPPER
+      - OXIDIZED_COPPER
+      - COPPER_BLOCK
+    "金属与矿物块":
+      - IRON_BLOCK
+      - GOLD_BLOCK
+      - DIAMOND_BLOCK
+      - EMERALD_BLOCK
+      - LAPIS_BLOCK
+      - REDSTONE_BLOCK
+      - NETHERITE_BLOCK
+      - COPPER_BLOCK
+    "陶瓦·玻璃·羊毛·混凝土":
+      - GLASS
+      - GLASS_PANE
+      - WHITE_TERRACOTTA
+      - WHITE_WOOL
+      - WHITE_CARPET
+      - WHITE_CONCRETE
+      - MOSS_BLOCK
+      - MOSS_CARPET
+    "下界与末地":
+      - NETHERRACK
+      - SOUL_SAND
+      - SOUL_SOIL
+      - NETHER_BRICKS
+      - RED_NETHER_BRICKS
+      - WARPED_STEM
+      - CRIMSON_STEM
+      - WARPED_HYPHAE
+      - CRIMSON_HYPHAE
+      - WARPED_PLANKS
+      - CRIMSON_PLANKS
+      - END_STONE
+      - END_STONE_BRICKS
+      - END_STONE_BRICK_STAIRS
+    "植物类建材":
+      - MOSS_BLOCK
+      - MOSS_CARPET
+      - BAMBOO_BLOCK
+      - BAMBOO_MOSAIC
+      - RESIN_BLOCK
+      - RESIN_BRICKS
+
+# ------------------------------------------------------------------
+# 自定义方块中文名（优先级最高；目录里没翻出来的名字在这里补一条就行）
+# ------------------------------------------------------------------
 custom-block-translations:
-  STONE: "石头"
-  DIAMOND_BLOCK: "钻石块"
+  COBBLESTONE: "圆石"
+  MOSSY_COBBLESTONE: "苔藓圆石"
+  DEEPSLATE_TILES: "深板岩瓦"
+  NETHERRACK: "地狱岩"
+  END_STONE: "末地石"
+  GLOWSTONE: "荧石"
   OBSIDIAN: "黑曜石"
+  PACKED_ICE: "浮冰"
+  BLUE_ICE: "蓝冰"
+  SNOW_BLOCK: "雪块"
+  CLAY: "黏土块"
+  MOSS_BLOCK: "苔藓块"
+  MOSS_CARPET: "苔藓地毯"
+  CUT_COPPER: "切制铜块"
+  PRISMARINE_BRICKS: "海晶石砖"
+  PURPUR_BLOCK: "紫珀块"
+  MUD_BRICKS: "泥砖"
+  NETHERITE_BLOCK: "下界合金块"
+  RESIN_BRICKS: "树脂砖"
+  OXIDIZED_COPPER: "氧化的铜块"
 
-# ---------------- 魔法方块规则 ----------------
-
-# 新魔法方块的默认使用次数（-1 = 无限）
+# ------------------------------------------------------------------
+# 次数与绑定
+# ------------------------------------------------------------------
 default-uses: 50
-
-# 允许的最大使用次数（防止 /mb settimes 写进天文数字）
 max-uses-limit: 100000
-
-# 是否启用绑定系统：魔法方块第一次放置时绑定到放置者
 enable-binding-system: true
-
-# 是否允许其他玩家使用/破坏别人绑定的方块
 allow-use-bound-blocks: false
 allow-break-bound-blocks: false
-
-# 禁止放置魔法方块的世界（大小写不敏感）
-blacklisted-worlds:
-  - world_nether
-  - world_the_end
-
-# 次数用尽时怎么处理手中的物品：convert（变成普通方块物品）| delete（直接删除）
+blacklisted-worlds: []
+# 次数用尽后：convert = 变成普通方块物品（推荐），delete = 直接消失
 depleted-action: convert
-
-# 破坏魔法方块时是否掉落带剩余次数的魔法方块（false = 只清除记录，按原版掉落）
 return-item-on-break: true
-
-# 爆炸（方块爆炸 / 实体爆炸）时是否掉落魔法方块
 drop-on-explosion: true
-
-# 魔法方块被活塞推动时：cancel（阻止活塞推动它，保住记录）| forget（放弃记录）
+# 活塞推魔法方块：cancel = 不许推（推荐，防止方块被推走导致身份丢失），forget = 推走就忘掉记录
 piston-behavior: cancel
-
-# 保护魔法方块不被以下情况摧毁：水流/岩浆流动、方块生长、草传播、燃烧、物理更新
 protect-from-fluid: true
 protect-from-growth: true
 protect-from-burn: true
 protect-from-physics: true
 
-# ---------------- 显示 ----------------
-
+# ------------------------------------------------------------------
+# 物品显示
+# ------------------------------------------------------------------
 display:
-  # %s 替换为方块显示名
   block-name-format: "&b✦ %s ✦"
   show-info:
     bound-player: true
     usage-count: true
     progress-bar: true
-  # 进度条长度（字符数）
-  progress-bar-length: 10
   decorative-lore:
-    enabled: true
-    # 支持插件自带变量：
-    # %uses% %remaining% %max% %progress% %bar% %owner%
-    # 若安装了 PlaceholderAPI，还会解析 PAPI 变量
+    enabled: false
     lines:
-      - "&7这是一个魔法方块，蕴含魔法的力量。"
-      - "&7剩余次数: &e%remaining%&7/&f%max%"
+      - "&8✦ 用掉 %uses% 次，还剩 %remaining% 次 ✦"
+  progress-bar-length: 10
 
-# ---------------- GUI ----------------
-
+# ------------------------------------------------------------------
+# GUI
+# ------------------------------------------------------------------
 gui:
-  title: "&8⚡ &bMagicBlockPlus 选择"
+  title: "&8⚡ &b魔法方块选择 &8（建筑方块）"
   rows: 6
-  # 每页容量 = rows*9 - 按钮槽位（按钮在第 6 行）
   buttons:
     previous-page:
       material: ARROW
-      name: "&a« 上一页"
-      lore: ["&7点击返回上一页"]
+      name: "&a上一页"
+      lore:
+        - "&7翻到上一页"
       slot: 45
       disabled-material: GRAY_DYE
-      disabled-name: "&8« 上一页（禁用）"
-    next-page:
-      material: ARROW
-      name: "&a下一页 »"
-      lore: ["&7点击前往下一页"]
-      slot: 53
-      disabled-material: GRAY_DYE
-      disabled-name: "&8下一页 »（禁用）"
+      disabled-name: "&c没有上一页"
     page-info:
       material: PAPER
-      name: "&e第 {page}/{total} 页"
-      lore: ["&7当前页码"]
-      slot: 49
+      name: "&f第 %page% 页"
+      lore:
+        - "&7点击查看页码"
+      slot: 46
+      disabled-material: PAPER
+      disabled-name: "&f页码"
+    next-page:
+      material: ARROW
+      name: "&a下一页"
+      lore:
+        - "&7翻到下一页"
+      slot: 47
+      disabled-material: GRAY_DYE
+      disabled-name: "&c没有下一页"
     close:
       material: BARRIER
       name: "&c关闭"
-      lore: ["&7点击关闭界面"]
-      slot: 47
+      lore:
+        - "&7关闭界面"
+      slot: 53
+      disabled-material: BARRIER
+      disabled-name: "&c关闭"
+  # 手动追加的材料（归类到「手动追加」；建筑目录之外还想给什么方块就写在这里）
+  materials: []
+  # 手动追加的分组材料
+  group: {}
 
-  # 基础可用材料（拥有 magicblock.gui 权限即可看到）
-  # 写错或当前版本不存在的材料会被跳过并记录到日志（不会崩溃）
-  materials:
-    - STONE
-    - COBBLESTONE
-    - OAK_PLANKS
-    - SPRUCE_PLANKS
-    - BIRCH_PLANKS
-    - JUNGLE_PLANKS
-    - ACACIA_PLANKS
-    - DARK_OAK_PLANKS
-    - SAND
-    - GRAVEL
-    - GLASS
-    - REDSTONE_BLOCK
-    - LAPIS_BLOCK
-    - IRON_BLOCK
-    - GOLD_BLOCK
-    - DIAMOND_BLOCK
-    - EMERALD_BLOCK
-    - OBSIDIAN
-    - NETHERRACK
-    - SOUL_SAND
-    - NETHER_BRICKS
-    - END_STONE
-    - WHITE_CONCRETE
-    - ORANGE_CONCRETE
-    - MAGENTA_CONCRETE
-    - LIGHT_BLUE_CONCRETE
-    - YELLOW_CONCRETE
-    - LIME_CONCRETE
-    - PINK_CONCRETE
-    - GRAY_CONCRETE
-    - LIGHT_GRAY_CONCRETE
-    - CYAN_CONCRETE
-    - PURPLE_CONCRETE
-    - BLUE_CONCRETE
-    - BROWN_CONCRETE
-    - GREEN_CONCRETE
-    - RED_CONCRETE
-    - BLACK_CONCRETE
+# 单个材料的默认次数（覆盖 default-uses）
+material-uses:
+  OBSIDIAN: 20
+  NETHERITE_BLOCK: 10
 
-  # 组材料：需要权限 magicblock.group.<组名>
-  group:
-    vip-material:
-      - QUARTZ_BLOCK
-      - PRISMARINE
-      - PURPUR_BLOCK
-    mvp-material:
-      - BEACON
-      - DRAGON_EGG
-      - NETHERITE_BLOCK
-
-# ---------------- 持久化 ----------------
-
+# ------------------------------------------------------------------
+# 存储
+# ------------------------------------------------------------------
 storage:
-  # 世界里的魔法方块记录文件：plugins/MagicBlockPlus/world-blocks.yml
-  # 玩家保存的方块列表文件：plugins/MagicBlockPlus/bindings.yml
-  # 最迟多少秒落盘一次（脏数据）
   save-interval-seconds: 5
-  # 关闭插件时强制保存
   save-on-disable: true
-  # 启动时是否校验并清理指向空气的记录（会加载区块，建议关掉，靠事件自然清理）
   validate-on-startup: false
 
-# ---------------- 其它 ----------------
-
-# 记录玩家使用日志（默认关，避免刷日志）
+# ------------------------------------------------------------------
+# 其它开关
+# ------------------------------------------------------------------
+debug-mode: false
 log-usage: false
-
-# 启用统计（/mb stats）
 enable-statistics: true
-
-# 启动时异步检查 GitHub 最新 release（默认关，避免联网）
 check-updates: false
-update-check-owner: "niubikelashi"
-update-check-repo: "MagicBlockPlus"
-
-# 启动时跑一遍内部自检并打印 PASS/FAIL（生产环境保持 false）
+update-check-owner: niubikelashi
+update-check-repo: MagicBlockPlus
 self-test: false
 
-# 打印调试日志（排障时临时开，平时保持 false）
-debug-mode: false
-
-# ---------------- 消息 ----------------
-# language 决定读哪一组；缺的键会退回 zh_CN。
-# 占位符：%player% %material% %owner% %reason% %count% %remaining% %total% %page% %stats% %version% %current% %error% %details% %state% %label% %food% %api%
-
+# ------------------------------------------------------------------
+# 消息（zh_CN 全量汉化；en 保留一份给英文服务器）
+# ------------------------------------------------------------------
 messages:
   zh_CN:
-    no-permission: "&c你没有权限执行这个操作。"
-    no-permission-use: "&c你没有权限使用魔法方块。"
-    no-permission-break: "&c你没有权限破坏魔法方块。"
-    player-required: "&c这个命令只能由玩家执行。"
-    player-not-found: "&c找不到玩家 %player%。"
-    unknown-material: "&c材料 %material% 不存在（当前服务端版本不支持）。"
-    unknown-food: "&c食物 %food% 没有在 food.yml 里定义。"
-    unknown-command: "&c未知子命令 %label%，用 /mb help 查看用法。"
-    usage: "&e用法：/mb help"
-    help: "&b✦ MagicBlockPlus ✦"
-    help-commands: "&7/mb gui ｜ /mb search <关键词> ｜ /mb list ｜ /mb get <材料> [次数] ｜ /mb give <玩家> <材料> [次数] ｜ /mb food <食物> [次数] ｜ /mb retrieve <世界> <x> <y> <z> ｜ /mb settimes <世界> <x> <y> <z> <次数> ｜ /mb addtimes <世界> <x> <y> <z> <增减> ｜ /mb stats ｜ /mb reload ｜ /mb version"
-    world-blacklisted: "&c这个世界不允许放置魔法方块。"
-    depleted: "&c这个魔法物品的使用次数已用尽。"
-    bound-to-you: "&7已绑定到你。"
-    not-bound-to-you: "&c它属于 %owner%，你不能用它。"
-    got-with-count: "&7获得 %count% 个，剩余次数 %remaining%。"
-    gave-to-player: "&7已给 %player% 一个魔法方块（次数 %remaining%）。"
-    retrieved: "&7已取回 %block%。"
-    retrieve-failed: "&c取回失败：%reason%"
-    toggled-hidden: "&7列表显示状态已切换：%state%"
-    gui-page-info: "&7第 %page% 页 / 共 %total% 项"
-    stats: "&7统计：%stats%"
-    block-count: "&7世界里共有 %count% 个魔法方块"
-    material-count: "&7可选材料 %total% 个"
-    set-times: "&7该方块的剩余次数已设为 %count%"
-    reloaded: "&7配置已重载，可用材料 %count% 个"
-    version: "&7MagicBlockPlus %version%（api-version %api%）"
-    updated: "&7发现新版本 %version%，当前 %current%。"
-    up-to-date: "&7已是最新版本 %current%。"
-    update-check-failed: "&7更新检查失败：%error%"
+    help: "&b=== MagicBlockPlus ==="
+    help-commands: "&7/mb gui &f打开建筑方块选择界面
+      &7/mb search <关键词> &f按中文名或材料名搜索（例如 玻璃、圆石）
+      &7/mb list &f查看我的魔法方块
+      &7/mb get <材料> <次数> &f给自己一个魔法方块
+      &7/mb give <玩家> <材料> <次数> &f给别人一个魔法方块
+      &7/mb food <食物> <次数> &f给自己一个魔法食物
+      &7/mb retrieve <世界> <x> <y> <z> &f取回世界里的魔法方块
+      &7/mb settimes <世界> <x> <y> <z> <次数> &f设置次数
+      &7/mb addtimes <世界> <x> <y> <z> <次数> &f增加次数
+      &7/mb stats &f查看统计
+      &7/mb reload &f重新读取配置
+      &7/mb version &f查看版本"
+    usage: "&c用法不对，输入 /mb help 看帮助"
+    no-permission: "&c你没有权限执行这条命令"
+    player-required: "&c这条命令只能由玩家执行"
+    unknown-command: "&c未知子命令: %label%"
+    unknown-material: "&c不认识的材料: %material%"
+    unknown-food: "&c没有这个魔法食物: %food%"
+    player-not-found: "&c玩家不在线: %player%"
+    got-with-count: "&a已给你 %count% 个，剩余次数 %remaining%"
+    gave-to-player: "&a已给 %player% 一个魔法方块，次数 %remaining%"
+    retrieve-failed: "&c取回失败: %reason%"
+    retrieved: "&a已取回 %block%"
+    not-bound-to-you: "&c这个方块属于 %owner%，不是你的"
+    set-times: "&a次数已设为 %count%"
+    depleted: "&7这个魔法方块的次数用完了，已变成普通方块"
+    toggled-hidden: "&a显示状态已切换: %state%"
+    gui-page-info: "&f第 %page% 页 / 共 %total% 页"
+    stats: "&b统计: %stats%"
+    block-count: "&b已知魔法方块 %count% 条"
+    material-count: "&b可用建筑方块 %total% 个"
+    reloaded: "&a配置已重新读取，可用建筑方块 %count% 个"
+    version: "&bMagicBlockPlus %version%（API %api%）"
+    updated: "&a发现新版本 %version%（当前 %current%）"
+    up-to-date: "&a版本已是最新（%current%）"
+    update-check-failed: "&7版本检查失败: %error%"
     self-test-pass: "&a自检通过：%details%"
-    self-test-fail: "&c自检失败：%details%"
+    self-test-fail: "&c自检未通过：%details%"
   en:
-    no-permission: "&cYou don't have permission for that."
-    no-permission-use: "&cYou don't have permission to use magic blocks."
-    no-permission-break: "&cYou don't have permission to break magic blocks."
-    player-required: "&cOnly players can run this command."
-    player-not-found: "&cPlayer %player% not found."
-    unknown-material: "&cMaterial %material% does not exist in this server version."
-    unknown-food: "&cFood %food% is not defined in food.yml."
-    unknown-command: "&cUnknown subcommand %label%; see /mb help."
-    usage: "&eUsage: /mb help"
-    help: "&b✦ MagicBlockPlus ✦"
-    help-commands: "&7/mb gui | /mb search <keyword> | /mb list | /mb get <material> [uses] | /mb give <player> <material> [uses] | /mb food <food> [uses] | /mb retrieve <world> <x> <y> <z> | /mb settimes <world> <x> <y> <z> <uses> | /mb addtimes <world> <x> <y> <z> <delta> | /mb stats | /mb reload | /mb version"
-    world-blacklisted: "&cMagic blocks are not allowed in this world."
-    depleted: "&cThis magic item has no uses left."
-    bound-to-you: "&7Bound to you."
-    not-bound-to-you: "&cIt belongs to %owner%; you can't use it."
-    got-with-count: "&7Got %count%, %remaining% uses left."
-    gave-to-player: "&7Gave %player% a magic block (%remaining% uses)."
-    retrieved: "&7Retrieved %block%."
+    help: "&b=== MagicBlockPlus ==="
+    help-commands: "&7/mb gui &fOpen the building-block picker
+      &7/mb search <keyword> &fSearch by name
+      &7/mb list &fShow my magic blocks
+      &7/mb get <material> <uses> &fGive yourself a magic block
+      &7/mb give <player> <material> <uses> &fGive a magic block to a player
+      &7/mb food <food> <uses> &fGive a magic food
+      &7/mb retrieve <world> <x> <y> <z> &fRetrieve a magic block
+      &7/mb settimes <world> <x> <y> <z> <uses> &fSet usage count
+      &7/mb addtimes <world> <x> <y> <z> <uses> &fAdd usage count
+      &7/mb stats &fShow statistics
+      &7/mb reload &fReload configuration
+      &7/mb version &fShow version"
+    usage: "&cWrong usage, run /mb help"
+    no-permission: "&cYou don't have permission"
+    player-required: "&cOnly players can run this command"
+    unknown-command: "&cUnknown subcommand: %label%"
+    unknown-material: "&cUnknown material: %material%"
+    unknown-food: "&cUnknown magic food: %food%"
+    player-not-found: "&cPlayer not online: %player%"
+    got-with-count: "&aGave %count%, remaining uses %remaining%"
+    gave-to-player: "&aGave %player% a magic block, uses %remaining%"
     retrieve-failed: "&cRetrieve failed: %reason%"
-    toggled-hidden: "&7List visibility toggled: %state%"
-    gui-page-info: "&7Page %page% of %total%"
-    stats: "&7Stats: %stats%"
-    block-count: "&7%count% magic blocks in the world"
-    material-count: "&7%total% selectable materials"
-    set-times: "&7Remaining uses set to %count%"
-    reloaded: "&7Config reloaded, %count% materials available"
-    version: "&7MagicBlockPlus %version% (api-version %api%)"
-    updated: "&7New version %version% found, current %current%."
-    up-to-date: "&7Already on the latest version %current%."
+    retrieved: "&aRetrieved %block%"
+    not-bound-to-you: "&cThis block belongs to %owner%"
+    set-times: "&aUsage set to %count%"
+    depleted: "&7This magic block ran out of uses and became a normal block"
+    toggled-hidden: "&aVisibility changed: %state%"
+    gui-page-info: "&fPage %page% / %total%"
+    stats: "&bStats: %stats%"
+    block-count: "&bKnown magic blocks: %count%"
+    material-count: "&bAvailable building blocks: %total%"
+    reloaded: "&aConfiguration reloaded, %count% building blocks available"
+    version: "&bMagicBlockPlus %version% (API %api%)"
+    updated: "&aNew version found: %version% (current %current%)"
+    up-to-date: "&aAlready up to date (%current%)"
     update-check-failed: "&7Update check failed: %error%"
     self-test-pass: "&aSelf-test passed: %details%"
     self-test-fail: "&cSelf-test failed: %details%"

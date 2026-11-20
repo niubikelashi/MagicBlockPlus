@@ -3,56 +3,56 @@ version: '1.0.0'
 main: io.github.niubikelashi.magicblockplus.MagicBlockPlusPlugin
 api-version: '1.20'
 authors: [niubikelashi]
-description: Magic blocks with limited use counts - rewritten with 1.20.1+ compatibility and fixes for disappearing blocks and duplication.
+description: 有限次数的魔法方块：兼容 1.20.1+，修复方块莫名其妙消失与刷方块；GUI 只收录常见建筑方块并全量汉化。
 softdepend: [PlaceholderAPI]
 folia-supported: false
 
 commands:
   magicblock:
-    description: MagicBlockPlus main command
+    description: MagicBlockPlus 主命令
     aliases: [mb, mbp]
-    usage: /<command> [subcommand] [args]
+    usage: /<command> <子命令> [参数]
     permission: magicblock.use
 
 permissions:
   magicblock.use:
-    description: Place and use magic blocks, open the selection GUI
+    description: 放置与使用魔法方块，打开选择界面
     default: true
   magicblock.break:
-    description: Break magic blocks
+    description: 破坏魔法方块
     default: true
   magicblock.breakprotected:
-    description: Bypass the owner restriction when breaking someone else's magic block
+    description: 破坏别人的魔法方块时绕过归属限制
     default: op
   magicblock.gui:
-    description: Open the block selection GUI
+    description: 打开建筑方块选择界面
     default: true
   magicblock.get:
-    description: Give yourself a magic block
+    description: 给自己一个魔法方块
     default: op
   magicblock.give:
-    description: Give a magic block to another player
+    description: 给别的玩家一个魔法方块
     default: op
   magicblock.food:
-    description: Give magic food items
+    description: 给出魔法食物物品
     default: op
   magicblock.list:
-    description: View your bound/saved blocks
+    description: 查看自己绑定/保存的魔法方块
     default: true
   magicblock.retrieve:
-    description: Retrieve saved blocks from your list
+    description: 从列表里取回保存的方块
     default: true
   magicblock.reload:
-    description: Reload configuration
+    description: 重新读取配置
     default: op
   magicblock.settimes:
-    description: Set or add default use counts per material
+    description: 设置或增加方块次数
     default: op
   magicblock.stats:
-    description: View plugin statistics
+    description: 查看插件统计
     default: op
   magicblock.admin:
-    description: All MagicBlockPlus commands
+    description: MagicBlockPlus 全部命令
     default: op
     children:
       magicblock.use: true

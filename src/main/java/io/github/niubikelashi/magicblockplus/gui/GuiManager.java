@@ -64,27 +64,32 @@ public class GuiManager {
         this.plugin = plugin;
     }
 
+    /**
+     * 材料表来自 BlockCatalog：内置常见建筑方块（按类别）+ 自动发现的同类新方块 +
+     * 用户在 gui.materials / gui.group 里手动加的材料。
+     */
     public void rebuildMaterials() {
         materials.clear();
-        Settings settings = plugin.settings();
-        for (String name : settings.materialNames) {
-            Material material = Material.matchMaterial(name == null ? "" : name.trim().toUpperCase(Locale.ROOT));
-            if (material == null || material.isAir() || !material.isBlock()) {
-                plugin.debug("跳过无效材料: " + name);
-                continue;
-            }
-            if (!materials.contains(material)) {
-                materials.add(material);
-            }
+        materials.addAll(plugin.catalog().materials());
+    }
+
+    public String categoryOf(Material material) {
+        return plugin.catalog().categoryOf(material);
+    }
+
+    /** 中文名或英文材料名都算命中，所以 /mb search 玻璃 能搜到 GLASS。 */
+    private boolean matches(Material material, String filter) {
+        if (filter.isEmpty()) {
+            return true;
         }
-        for (List<String> group : settings.groupMaterials.values()) {
-            for (String name : group) {
-                Material material = Material.matchMaterial(name == null ? "" : name.trim().toUpperCase(Locale.ROOT));
-                if (material != null && !material.isAir() && material.isBlock() && !materials.contains(material)) {
-                    materials.add(material);
-                }
-            }
+        if (material.name().toLowerCase(Locale.ROOT).contains(filter)) {
+            return true;
         }
+        String chinese = plugin.items().plainName(material);
+        if (chinese != null && chinese.toLowerCase(Locale.ROOT).contains(filter)) {
+            return true;
+        }
+        return plugin.catalog().categoryOf(material).contains(filter);
     }
 
     public int materialCount() {
@@ -111,7 +116,7 @@ public class GuiManager {
         session.perPage = contentSlots;
         session.reserved = reserved;
         for (Material material : materials) {
-            if (filter.isEmpty() || material.name().toLowerCase(Locale.ROOT).contains(filter)) {
+            if (matches(material, filter)) {
                 session.filtered.add(material.name());
             }
         }
@@ -138,8 +143,16 @@ public class GuiManager {
                 continue;
             }
             int uses = plugin.defaultUses(material);
-            inventory.setItem(slot, plugin.items().previewItem(material, uses, uses, null,
-                    List.of("&7左键领取 1 个，次数 " + uses)));
+        String chinese = plugin.items().plainName(material);
+        List<String> extra = new ArrayList<>();
+        extra.add("&7左键领取 1 个，次数 " + uses);
+        if (plugin.settings().showCategory) {
+            extra.add("&8类别: &7" + categoryOf(material));
+        }
+        if (!chinese.equals(material.name())) {
+            extra.add("&8枚举名: &7" + material.name());
+        }
+        inventory.setItem(slot, plugin.items().previewItem(material, uses, uses, null, extra));
         }
         int reserved = inventory.getSize() - 9;
         putButton(inventory, reserved, "previous-page", session.page > 0);
